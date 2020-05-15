@@ -34,8 +34,10 @@ class TwitterListener(StreamListener):
             return True
 
         def on_error(self, status):
+            if(status == 420):
+                return False
             print(status)
-            return
+            return False
 
 if __name__ == "__main__":
     keyWords = [" anime "]
