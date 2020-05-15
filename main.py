@@ -1,4 +1,6 @@
 import credentials
+import pandas as pd
+import numpy as np
 
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
@@ -7,15 +9,23 @@ from tweepy import Cursor
 from tweepy import API
 
 class TwitterClient():
-    def __init__(self):
+    def __init__(self, twitterUser = None):
         self.auth = TwitterAuthenticator().authenticate()
         self.client = API(self.auth)
+        self.twitterUser = twitterUser
 
     def get_user_timeline_tweets(self, num_tweets):
         tweets = []
-        for tweet in Cursor(self.client.user_timeline).items(num_tweets):
+        for tweet in Cursor(self.client.user_timeline, id=self.twitterUser).items(num_tweets):
             tweets.append(tweet)
         return tweets
+
+    def get_home_timeline_tweets(self, num_tweets):
+        tweets = []
+        for tweet in Cursor(self.client.home_timeline, id=self.twitterUser).items(num_tweets):
+            tweets.append(tweet)
+        return tweets
+
 class TwitterAuthenticator():
     def authenticate(self):
         auth = OAuthHandler(credentials.API_KEY, credentials.API_SECRET_KEY)
@@ -53,8 +63,8 @@ if __name__ == "__main__":
     keyWords = [" anime "]
     outputFile = "tweets.json"
 
-    client = TwitterClient()
-    print(client.get_user_timeline_tweets(5))
+    client = TwitterClient('pycon')
+    print(client.get_home_timeline_tweets(5))
 
 
     #streamer = TwitterStreamer()
