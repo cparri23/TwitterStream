@@ -3,19 +3,25 @@ import credentials
 from tweepy.streaming import StreamListener
 from tweepy import OAuthHandler
 from tweepy import Stream
+from tweepy import cursor
+from tweepy import API
 
-class TwitterStreamer():
-    # Class for streaming tweets
-    def stream_tweets(self, fetchedTweetsOutputFile, keywords):
-        listener = StdOutListener(fetchedTweetsOutputFile)
+class TwitterAuthenticator():
+    def authenticate(self):
         auth = OAuthHandler(credentials.API_KEY, credentials.API_SECRET_KEY)
         auth.set_access_token(credentials.ACCESS_TOKEN, credentials.ACCESS_TOKEN_SECRET)
-
+        return auth
+class TwitterStreamer():
+    # Class for streaming tweets
+    def __init__(self):
+        self.TwitterAuthenticator = TwitterAuthenticator()
+    def stream_tweets(self, fetchedTweetsOutputFile, keywords):
+        listener = TwitterListener(fetchedTweetsOutputFile)
+        auth = self.TwitterAuthenticator.authenticate()
         stream = Stream(auth, listener)
-
         stream.filter(track=keywords)
 
-class StdOutListener(StreamListener):
+class TwitterListener(StreamListener):
         def __init__(self, fetchedTweetsOutputFile):
             self.fetchedTweetsOutputFile = fetchedTweetsOutputFile
         def on_data(self, data):
@@ -32,7 +38,7 @@ class StdOutListener(StreamListener):
             return
 
 if __name__ == "__main__":
-    keyWords = [" rat "]
+    keyWords = [" anime "]
     outputFile = "tweets.json"
 
     streamer = TwitterStreamer()
